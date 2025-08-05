@@ -1,34 +1,36 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TokenSelector from './TokenSelector';
 import type { Token } from '../../types/tokens';
 import { tokens } from '../../const/tokens';
 import { TokenInput } from './TokenInput';
+import useTokenInfo from './hooks/useTokenInfo';
+import useTokenPrice from './hooks/useTokenPrice';
 
 export default function TokenConverter() {
   const [amount, setAmount] = useState<string>('');
   const [fromToken, setFromToken] = useState<Token | null>(null);
   const [toToken, setToToken] = useState<Token | null>(null);
-  const [equivalents, setEquivalents] = useState({ a: 0, b: 0 });
 
-  useEffect(() => {
-    const calculateEquivalents = async () => {
-      if (!amount || !fromToken || !toToken) return;
+  const { data: fromTokenData } = useTokenInfo({
+    chainId: fromToken?.chainId,
+    symbol: fromToken?.symbol,
+  });
+  const { data: toTokenData } = useTokenInfo({
+    chainId: toToken?.chainId,
+    symbol: toToken?.symbol,
+  });
 
-      try {
-        const fromPrice = 1;
-        const toPrice = 2;
+  const { data: fromPrice } = useTokenPrice({
+    chainId: fromTokenData?.chain,
+    tokenAddress: fromTokenData?.address,
+  });
+  const { data: toPrice } = useTokenPrice({
+    chainId: toTokenData?.chain,
+    tokenAddress: toTokenData?.address,
+  });
 
-        setEquivalents({
-          a: parseFloat(amount) / fromPrice,
-          b: parseFloat(amount) / toPrice,
-        });
-      } catch (error) {
-        console.error('Price fetch failed:', error);
-      }
-    };
-
-    calculateEquivalents();
-  }, [amount, fromToken, toToken]);
+  const equivalentFrom = amount ? parseFloat(amount) / (fromPrice?.unitPrice || 1) : 0;
+  const equivalentTo = amount ? parseFloat(amount) / (toPrice?.unitPrice || 1) : 0;
 
   return (
     <div className="token-converter-card w-96 p-6 border rounded-lg shadow-sm bg-white">
@@ -47,20 +49,18 @@ export default function TokenConverter() {
         oppositeToken={fromToken}
       />
 
-      {amount && fromToken && toToken && (
+      {amount && fromTokenData && toTokenData && (
         <div className="mt-4 p-4 bg-gray-50 rounded-lg space-y-2">
           <p className="font-medium">
-            ${parseFloat(amount).toFixed(2)} ≈
+            ${parseFloat(amount).toFixed(2)} ≈{' '}
             <span className="text-blue-600">
-              {' '}
-              {equivalents.a.toFixed(6)} {fromToken.symbol}
+              {equivalentFrom.toFixed(fromTokenData.decimals)} {fromTokenData.symbol}
             </span>
           </p>
           <p className="font-medium">
-            ${parseFloat(amount).toFixed(2)} ≈
+            ${parseFloat(amount).toFixed(2)} ≈{' '}
             <span className="text-green-600">
-              {' '}
-              {equivalents.b.toFixed(6)} {toToken.symbol}
+              {equivalentTo.toFixed(toTokenData.decimals)} {toTokenData.symbol}
             </span>
           </p>
         </div>
