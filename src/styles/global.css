@@ -1,0 +1,53 @@
+@import 'tailwindcss';
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.no-spinner {
+  -moz-appearance: textfield;
+}
+
+select {
+  background-image: none;
+  padding-right: 2rem;
+}
+
+input,
+select {
+  line-height: 1.5 !important;
+}
+
+.select-arrow {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem !important;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.token-card {
+  transition: all 0.2s ease;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.token-card:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+.input-focus,
+.select-focus {
+  transition: box-shadow 0.1s ease;
+}
+
+.input-focus:focus,
+.select-focus:focus {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  outline: 2px solid transparent;
+  border-color: #3b82f6;
+}

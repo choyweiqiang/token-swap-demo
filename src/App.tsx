@@ -1,10 +1,11 @@
-import './App.css';
+import TokenConverter from './features/token-converter/TokenConverter';
+import './styles/global.css';
 
 function App() {
   return (
-    <>
-      <div>Hello World</div>
-    </>
+    <div className="flex justify-center items-center h-screen">
+      <TokenConverter />
+    </div>
   );
 }
 
