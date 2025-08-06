@@ -1,50 +1,65 @@
 import { useState } from 'react';
 
-export default function SwapButton({ onClick }: { onClick: () => void }) {
-  const [hasRotated, setHasRotated] = useState(false);
+interface SwapButtonProps {
+  onClick: () => void;
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
+}
+
+export default function SwapButton({ onClick, size = 'md', className = '' }: SwapButtonProps) {
+  const [isRotated, setIsRotated] = useState(false);
 
   const handleClick = () => {
-    setHasRotated(true);
+    setIsRotated(!isRotated);
     onClick();
-    setTimeout(() => setHasRotated(false), 300);
   };
+
+  // Size classes
+  const sizeClasses = {
+    sm: 'p-1.5',
+    md: 'p-2',
+    lg: 'p-3',
+  };
+
+  // Icon size
+  const iconSize = {
+    sm: 'h-5 w-5',
+    md: 'h-6 w-6',
+    lg: 'h-7 w-7',
+  };
+
+  // Arrow paths
+  const horizontalArrow = 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4';
+  const verticalArrow = 'M16 4v12l-4-4m4 4l4-4M8 20V8l4 4m-4-4l-4 4';
 
   return (
     <button
       onClick={handleClick}
-      className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-all duration-300"
+      className={`rounded-full bg-gray-100 hover:bg-gray-200 transition-all duration-300 ${sizeClasses[size]} ${className}`}
       aria-label="Swap tokens"
     >
-      {/* Horizontal arrows (shown on md screens and up) */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`h-6 w-6 text-gray-600 hidden md:block transition-transform duration-300 ${hasRotated ? 'rotate-180' : ''}`}
+        className={`${iconSize[size]} text-gray-600 transition-transform duration-300 hidden md:block ${
+          isRotated ? 'rotate-180' : ''
+        }`}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"
-        />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={horizontalArrow} />
       </svg>
 
-      {/* Vertical arrows (shown on small screens) */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`h-6 w-6 text-gray-600 md:hidden transition-transform duration-300 ${hasRotated ? 'rotate-180' : ''}`}
+        className={`${iconSize[size]} text-gray-600 transition-transform duration-300 md:hidden ${
+          isRotated ? 'rotate-180' : ''
+        }`}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
       >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M16 4v12l-4-4m4 4l4-4M8 20V8l4 4m-4-4l-4 4"
-        />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={verticalArrow} />
       </svg>
     </button>
   );

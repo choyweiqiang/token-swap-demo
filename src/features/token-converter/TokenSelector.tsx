@@ -1,9 +1,9 @@
-import Select from '../../ui/form/Select';
 import type { Token } from '../../types/tokens';
 import useTokenPrice from './hooks/useTokenPrice';
 import useTokenInfo from './hooks/useTokenInfo';
 import { Skeleton } from '../../ui/loading/Skeleton';
 import type { Erc20AssetInfo } from '@funkit/api-base';
+import Popover from '../../ui/form/Popover';
 
 function TokenSelect({
   tokens,
@@ -16,18 +16,25 @@ function TokenSelect({
 }) {
   const options = tokens.map((token) => ({
     value: token.symbol,
-    label: `${token.name} (${token.symbol})`,
+    label: token.name,
+    symbol: token.symbol,
+    icon: token.icon
+      ? `https://icons.llamao.fi/icons/chains/rsz_${token.icon}.jpg`
+      : '/unknown-logo.png',
   }));
 
   return (
-    <Select
+    <Popover
       options={options}
       value={selectedToken?.symbol || ''}
-      onChange={(e) => {
-        const token = tokens.find((t) => t.symbol === e.target.value);
+      onChange={(val) => {
+        const token = tokens.find((t) => t.symbol === val);
         if (token) onTokenSelect(token);
       }}
       placeholder="Select token"
+      buttonClassName="select-focus border-gray-300 hover:border-blue-500 transition focus:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.15)] focus-visible:border-blue-500"
+      popoverClassName="shadow-xl"
+      optionClassName="hover:bg-blue-50"
     />
   );
 }

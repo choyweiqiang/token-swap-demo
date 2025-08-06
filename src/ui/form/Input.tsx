@@ -1,7 +1,17 @@
-import { inputBaseClasses, inputDisabledClasses } from '../../styles/ui';
 import type { InputProps } from '../../types/form';
 
-export default function Input({ className, disabled, error, prefix, ...props }: InputProps) {
+export default function Input({
+  className = '',
+  disabled = false,
+  error = '',
+  prefix,
+  baseClasses = 'w-full h-10 border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition align-middle',
+  disabledClasses = 'bg-gray-100 cursor-not-allowed opacity-80',
+  ...props
+}: InputProps & {
+  baseClasses?: string;
+  disabledClasses?: string;
+}) {
   return (
     <div className={`relative ${className}`}>
       {prefix && (
@@ -10,11 +20,10 @@ export default function Input({ className, disabled, error, prefix, ...props }: 
         </span>
       )}
       <input
-        className={`no-spinner input-focus ${inputBaseClasses} ${
-          prefix ? 'pl-7' : ''
-        } ${disabled ? inputDisabledClasses : ''} ${
-          error ? 'border-red-500 focus:ring-red-500' : ''
-        }`}
+        className={`no-spinner input-focus ${baseClasses} ${prefix ? 'pl-7' : ''} ${
+          disabled ? disabledClasses : ''
+        } ${error ? 'border-red-500 focus:ring-red-500' : ''}`}
+        disabled={disabled}
         {...props}
       />
 
