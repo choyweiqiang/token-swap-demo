@@ -94,7 +94,7 @@ export default function TokenSelector({
 }: {
   tokens: Token[];
   selectedToken: Token | null;
-  onTokenSelect: (token: Token) => void;
+  onTokenSelect: (token: Token | null) => void;
   oppositeToken: Token | null;
   amount: string;
 }) {

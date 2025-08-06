@@ -1,21 +1,48 @@
 import { useState } from 'react';
 import TokenSelector from './TokenSelector';
 import type { Token } from '../../types/tokens';
-// import { tokens } from '../../const/tokens';
 import { TokenInput } from './TokenInput';
 import SwapButton from '../../ui/basic/SwapButton';
 import { useCoinGeckoTokens } from './hooks/useCoinGeckoTokens';
 import { Spinner } from '../../ui/loading/Spinner';
 
-export default function TokenConverter() {
+interface TokenSelection {
+  chainId: string;
+  tokenId: string | null;
+}
+
+export default function TokenConverter({
+  chainIds,
+  tokenSelections,
+  onTokenSelect,
+  className = '',
+}: {
+  chainIds: string[];
+  tokenSelections: {
+    from: TokenSelection;
+    to: TokenSelection;
+  };
+  onTokenSelect: (selections: { from: TokenSelection; to: TokenSelection }) => void;
+  className?: string;
+}) {
   const [amount, setAmount] = useState<string>('');
-  const [fromToken, setFromToken] = useState<Token | null>(null);
-  const [toToken, setToToken] = useState<Token | null>(null);
-  const { data: tokens, isLoading } = useCoinGeckoTokens({ chainIds: ['1', '137', '8453'] });
+  const { data: tokens, isLoading } = useCoinGeckoTokens({ chainIds });
+
+  const handleTokenSelect = (type: 'from' | 'to', token: Token | null) => {
+    onTokenSelect({
+      ...tokenSelections,
+      [type]: {
+        chainId: token?.chainId || '',
+        tokenId: token?.id || null,
+      },
+    });
+  };
 
   const handleSwapTokens = () => {
-    setFromToken(toToken);
-    setToToken(fromToken);
+    onTokenSelect({
+      from: tokenSelections.to,
+      to: tokenSelections.from,
+    });
   };
 
   if (isLoading) {
@@ -26,10 +53,13 @@ export default function TokenConverter() {
     );
   }
 
-  return (
-    <div className="token-converter-card w-full max-w-3xl p-6 border rounded-lg shadow-sm bg-white">
-      <h1 className="text-2xl font-bold mb-6">Token Price Explorer</h1>
+  const fromToken = tokens?.find((t) => t.id === tokenSelections.from.tokenId) || null;
+  const toToken = tokens?.find((t) => t.id === tokenSelections.to.tokenId) || null;
 
+  return (
+    <div
+      className={`token-converter-card w-full max-w-3xl p-6 border rounded-lg shadow-sm bg-white ${className}`}
+    >
       <div className="mb-4">
         <TokenInput value={amount} onChange={setAmount} />
       </div>
@@ -39,7 +69,7 @@ export default function TokenConverter() {
           <TokenSelector
             tokens={tokens || []}
             selectedToken={fromToken}
-            onTokenSelect={setFromToken}
+            onTokenSelect={(token) => handleTokenSelect('from', token)}
             oppositeToken={toToken}
             amount={amount}
           />
@@ -53,7 +83,7 @@ export default function TokenConverter() {
           <TokenSelector
             tokens={tokens || []}
             selectedToken={toToken}
-            onTokenSelect={setToToken}
+            onTokenSelect={(token) => handleTokenSelect('to', token)}
             oppositeToken={fromToken}
             amount={amount}
           />
