@@ -41,8 +41,9 @@ function TokenSelect({
       buttonClassName="w-full h-10 border border-gray-200 rounded-lg px-3 py-2 hover:border-blue-500 transition focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-sm"
       popoverClassName="shadow-xl border border-gray-200 bg-white"
       optionClassName="hover:bg-blue-50"
-      minWidth="20rem"
-      maxWidth="30rem"
+      minWidth="18rem"
+      maxWidth="26rem"
+      align="right"
     />
   );
 }
@@ -62,7 +63,7 @@ function PriceDisplay({
 
   return (
     <div className="text-sm text-gray-600 font-mono tracking-tight mt-2">
-      ≈ {tokenAmount.toFixed(6)} {tokenInfo.symbol}
+      {tokenAmount.toFixed(6)} {tokenInfo.symbol}
     </div>
   );
 }
@@ -165,15 +166,20 @@ export default function TokenSelector({
 
   useEffect(() => {
     if (price?.unitPrice) {
-      if (previousPrice !== null && previousPrice !== price.unitPrice) {
+      // Only calculate difference if we have a valid previous price (> 0)
+      if (previousPrice !== null && previousPrice > 0 && previousPrice !== price.unitPrice) {
         const valueDiff = price.unitPrice - previousPrice;
-        const percentDiff = (valueDiff / previousPrice) * 100;
+        const percentDiff = previousPrice !== 0 ? (valueDiff / previousPrice) * 100 : 0;
 
-        setPriceDifference({
-          value: valueDiff,
-          percent: percentDiff,
-          trend: valueDiff >= 0 ? 'up' : 'down',
-        });
+        const MIN_PRICE_CHANGE = 0.01; // 1%
+
+        if (Math.abs(percentDiff) >= MIN_PRICE_CHANGE) {
+          setPriceDifference({
+            value: valueDiff,
+            percent: percentDiff,
+            trend: valueDiff >= 0 ? 'up' : 'down',
+          });
+        }
       }
       setPreviousPrice(price.unitPrice);
     }
@@ -195,27 +201,28 @@ export default function TokenSelector({
         )}
       </div>
 
-      <TokenSelect
-        tokens={availableTokens}
-        selectedToken={selectedToken}
-        onTokenSelect={onTokenSelect}
-      />
-
-      {selectedToken && (
-        <>
+      <div className="flex justify-between items-center gap-3">
+        <div className="min-w-[120px]">
           <PriceDisplay
             tokenInfo={tokenInfo}
             tokenAmount={tokenAmount}
             isLoading={isLoadingPrice}
           />
+        </div>
+        <TokenSelect
+          tokens={availableTokens}
+          selectedToken={selectedToken}
+          onTokenSelect={onTokenSelect}
+        />
+      </div>
 
-          <PriceDisclaimer
-            tokenInfo={tokenInfo}
-            unitPrice={price?.unitPrice}
-            isLoading={isLoadingPrice}
-            priceDifference={priceDifference || undefined}
-          />
-        </>
+      {selectedToken && (
+        <PriceDisclaimer
+          tokenInfo={tokenInfo}
+          unitPrice={price?.unitPrice}
+          isLoading={isLoadingPrice}
+          priceDifference={priceDifference || undefined}
+        />
       )}
     </div>
   );

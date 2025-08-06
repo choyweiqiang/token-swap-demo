@@ -23,6 +23,7 @@ interface PopoverProps {
   searchPlaceholder?: string;
   maxWidth?: string;
   minWidth?: string;
+  align?: 'left' | 'right';
 }
 
 export default function Popover({
@@ -39,6 +40,7 @@ export default function Popover({
   searchPlaceholder = 'Search',
   maxWidth = '24rem',
   minWidth = '16rem',
+  align = 'left',
 }: PopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -96,7 +98,7 @@ export default function Popover({
     <div className={`relative ${className}`} ref={popoverRef}>
       <button
         type="button"
-        className={`flex items-center justify-between w-full px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 ${
+        className={`inline-flex items-center justify-between px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 ${
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
         } ${buttonClassName}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -130,10 +132,10 @@ export default function Popover({
 
       {isOpen && (
         <div
-          className={`absolute z-20 w-64 ${
+          className={`absolute z-20 ${align === 'right' ? 'right-0' : 'left-0'} ${
             placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
           } bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden ${popoverClassName}`}
-          style={{ minWidth, maxWidth, width: 'auto' }}
+          style={{ minWidth, maxWidth }}
         >
           <div className="p-2 border-b border-gray-200">
             <div className="relative">
@@ -146,7 +148,7 @@ export default function Popover({
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
               <svg
-                className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400"
+                className="absolute left-2.5 top-1/2 h-4 w-4 text-gray-400 -translate-y-1/2"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
