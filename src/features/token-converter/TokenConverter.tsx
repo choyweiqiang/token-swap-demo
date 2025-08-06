@@ -5,6 +5,7 @@ import { TokenInput } from './TokenInput';
 import SwapButton from '../../ui/basic/SwapButton';
 import { useCoinGeckoTokens } from './hooks/useCoinGeckoTokens';
 import { Spinner } from '../../ui/loading/Spinner';
+import { ErrorAlert } from '../../ui/feedback/ErrorAlert';
 
 interface TokenSelection {
   chainId: string;
@@ -26,7 +27,7 @@ export default function TokenConverter({
   className?: string;
 }) {
   const [amount, setAmount] = useState<string>('');
-  const { data: tokens, isLoading } = useCoinGeckoTokens({ chainIds });
+  const { data: tokens, isLoading, error } = useCoinGeckoTokens({ chainIds });
 
   const handleTokenSelect = (type: 'from' | 'to', token: Token | null) => {
     onTokenSelect({
@@ -57,43 +58,46 @@ export default function TokenConverter({
   const toToken = tokens?.find((t) => t.id === tokenSelections.to.tokenId) || null;
 
   return (
-    <div
-      className={`w-full max-w-3xl bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}
-    >
-      <div className="flex flex-col md:flex-row gap-4 mb-4">
-        <div className="flex-1">
-          <TokenSelector
-            tokens={tokens || []}
-            selectedToken={fromToken}
-            onTokenSelect={(token) => handleTokenSelect('from', token)}
-            oppositeToken={toToken}
-            amount={amount}
-            label="You Pay"
-          />
+    <>
+      {error ? <ErrorAlert message={error.message} /> : null}
+      <div
+        className={`w-full max-w-3xl bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}
+      >
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
+          <div className="flex-1">
+            <TokenSelector
+              tokens={tokens || []}
+              selectedToken={fromToken}
+              onTokenSelect={(token) => handleTokenSelect('from', token)}
+              oppositeToken={toToken}
+              amount={amount}
+              label="You Pay"
+            />
+          </div>
+
+          <div className="flex items-center justify-center">
+            <SwapButton
+              onClick={handleSwapTokens}
+              className="hover:border-blue-300 hover:text-blue-500"
+            />
+          </div>
+
+          <div className="flex-1">
+            <TokenSelector
+              tokens={tokens || []}
+              selectedToken={toToken}
+              onTokenSelect={(token) => handleTokenSelect('to', token)}
+              oppositeToken={fromToken}
+              amount={amount}
+              label="You Receive"
+            />
+          </div>
         </div>
 
-        <div className="flex items-center justify-center">
-          <SwapButton
-            onClick={handleSwapTokens}
-            className="hover:border-blue-300 hover:text-blue-500"
-          />
-        </div>
-
-        <div className="flex-1">
-          <TokenSelector
-            tokens={tokens || []}
-            selectedToken={toToken}
-            onTokenSelect={(token) => handleTokenSelect('to', token)}
-            oppositeToken={fromToken}
-            amount={amount}
-            label="You Receive"
-          />
+        <div className="border-t border-gray-100 pt-4">
+          <TokenInput value={amount} onChange={setAmount} />
         </div>
       </div>
-
-      <div className="border-t border-gray-100 pt-4">
-        <TokenInput value={amount} onChange={setAmount} />
-      </div>
-    </div>
+    </>
   );
 }

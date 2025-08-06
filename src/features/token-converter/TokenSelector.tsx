@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import InformationCircleIcon from '../../assets/icons/InformationCircleIcon';
 import { formatAmount } from '../../utils/amount';
 import Tooltip from '../../ui/basic/Tooltip';
+import { ErrorAlert } from '../../ui/feedback/ErrorAlert';
 
 function TokenSelect({
   tokens,
@@ -17,7 +18,7 @@ function TokenSelect({
 }: {
   tokens: Token[];
   selectedToken: Token | null;
-  onTokenSelect: (token: Token) => void;
+  onTokenSelect: (token: Token | null) => void;
 }) {
   const options = tokens.map((token) => ({
     value: token.id,
@@ -35,8 +36,12 @@ function TokenSelect({
       options={options}
       value={selectedToken?.id || ''}
       onChange={(val) => {
-        const token = tokens.find((t) => t.id === val);
-        if (token) onTokenSelect(token);
+        if (val === '') {
+          onTokenSelect(null); // Handle null selection
+        } else {
+          const token = tokens.find((t) => t.id === val);
+          if (token) onTokenSelect(token);
+        }
       }}
       placeholder="Select token"
       searchPlaceholder="Search token"
@@ -136,14 +141,14 @@ function PriceDisclaimer({
 }
 
 export default function TokenSelector({
-  tokens,
+  tokens = [],
   selectedToken,
   onTokenSelect,
   oppositeToken,
   amount,
   label,
 }: {
-  tokens: Token[];
+  tokens?: Token[];
   selectedToken: Token | null;
   onTokenSelect: (token: Token | null) => void;
   oppositeToken: Token | null;
@@ -158,15 +163,21 @@ export default function TokenSelector({
     trend: 'up' | 'down';
   } | null>(null);
 
-  const { data: tokenInfo } = useTokenInfo({
+  const { data: tokenInfo, error: tokenInfoError } = useTokenInfo({
     chainId: selectedToken?.chainId,
     symbol: selectedToken?.symbol,
   });
 
-  const { data: price, isLoading: isLoadingPrice } = useTokenPrice({
+  const {
+    data: price,
+    isLoading: isLoadingPrice,
+    error: errorPrice,
+  } = useTokenPrice({
     chainId: tokenInfo?.chain,
     tokenAddress: tokenInfo?.address,
   });
+
+  const error = tokenInfoError?.message || errorPrice?.message;
 
   const tokenAmount = amount && price?.unitPrice ? parseFloat(amount) / price.unitPrice : 0;
 
@@ -192,48 +203,49 @@ export default function TokenSelector({
   }, [price?.unitPrice]);
 
   return (
-    <div className="flex flex-col gap-3 p-4 border border-gray-200 rounded-lg bg-white shadow-sm w-full min-w-0">
-      <div className="flex justify-between items-center min-w-0">
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
-          {label}
-        </span>
-        {selectedToken && (
-          <div className="flex items-center min-w-0">
-            <span className="text-xs text-gray-500 font-mono truncate">
-              {selectedToken.chainName}
-            </span>
-            <img
-              src={`https://icons.llamao.fi/icons/chains/rsz_${CHAIN_CONFIG.find((c) => c.id === selectedToken.chainId)?.icon}.jpg`}
-              alt={selectedToken.chainName}
-              className="w-4 h-4 rounded-full ml-2"
+    <>
+      {error ? <ErrorAlert message={error} /> : null}
+      <div className="flex flex-col gap-3 p-4 border border-gray-200 rounded-lg bg-white shadow-sm w-full min-w-0">
+        <div className="flex justify-between items-center min-w-0">
+          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
+            {label}
+          </span>
+          {selectedToken && (
+            <div className="flex items-center min-w-0">
+              <span className="text-xs text-gray-500 font-mono truncate">
+                {selectedToken.chainName}
+              </span>
+              <img
+                src={`https://icons.llamao.fi/icons/chains/rsz_${CHAIN_CONFIG.find((c) => c.id === selectedToken.chainId)?.icon}.jpg`}
+                alt={selectedToken.chainName}
+                className="w-4 h-4 rounded-full ml-2"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="flex justify-between items-center gap-3 w-full min-w-0">
+          <div className="min-w-[120px] max-w-[50%] overflow-hidden">
+            <PriceDisplay
+              tokenInfo={tokenInfo}
+              tokenAmount={tokenAmount}
+              isLoading={isLoadingPrice}
             />
           </div>
-        )}
-      </div>
-
-      <div className="flex justify-between items-center gap-3 w-full min-w-0">
-        <div className="min-w-[120px] max-w-[50%] overflow-hidden">
-          <PriceDisplay
-            tokenInfo={tokenInfo}
-            tokenAmount={tokenAmount}
-            isLoading={isLoadingPrice}
+          <TokenSelect
+            tokens={availableTokens}
+            selectedToken={selectedToken}
+            onTokenSelect={onTokenSelect}
           />
         </div>
-        <TokenSelect
-          tokens={availableTokens}
-          selectedToken={selectedToken}
-          onTokenSelect={onTokenSelect}
-        />
-      </div>
 
-      {selectedToken && (
         <PriceDisclaimer
           tokenInfo={tokenInfo}
           unitPrice={price?.unitPrice}
           isLoading={isLoadingPrice}
           priceDifference={priceDifference || undefined}
         />
-      )}
-    </div>
+      </div>
+    </>
   );
 }
