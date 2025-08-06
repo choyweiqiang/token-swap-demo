@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 @import 'tailwindcss';
 
+* {
+  min-width: 0;
+}
+
 :root {
   --font-main: 'Space Grotesk', -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
@@ -114,4 +118,8 @@ select {
   to {
     opacity: 0;
   }
+}
+
+.tooltip-arrow {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
 }
