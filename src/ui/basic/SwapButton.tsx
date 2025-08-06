@@ -18,14 +18,14 @@ export default function SwapButton({ onClick, size = 'md', className = '' }: Swa
   const sizeClasses = {
     sm: 'p-1.5',
     md: 'p-2',
-    lg: 'p-3',
+    lg: 'p-2.5',
   };
 
   // Icon size
   const iconSize = {
-    sm: 'h-5 w-5',
-    md: 'h-6 w-6',
-    lg: 'h-7 w-7',
+    sm: 'h-4 w-4',
+    md: 'h-5 w-5',
+    lg: 'h-6 w-6',
   };
 
   // Arrow paths
@@ -35,31 +35,48 @@ export default function SwapButton({ onClick, size = 'md', className = '' }: Swa
   return (
     <button
       onClick={handleClick}
-      className={`rounded-full bg-gray-100 hover:bg-gray-200 transition-all duration-300 ${sizeClasses[size]} ${className}`}
+      className={`
+        rounded-full border border-gray-200 
+        bg-white hover:bg-gray-50 
+        transition-all duration-200
+        shadow-sm hover:shadow-md
+        ${sizeClasses[size]} 
+        ${className}
+      `}
       aria-label="Swap tokens"
     >
+      {/* Horizontal arrow (desktop) */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`${iconSize[size]} text-gray-600 transition-transform duration-300 hidden md:block ${
-          isRotated ? 'rotate-180' : ''
-        }`}
+        className={`
+          ${iconSize[size]} text-gray-600 
+          transition-transform duration-300
+          hidden md:block
+          ${isRotated ? 'rotate-180' : ''}
+        `}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        strokeWidth={1.5}
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={horizontalArrow} />
+        <path strokeLinecap="round" strokeLinejoin="round" d={horizontalArrow} />
       </svg>
 
+      {/* Vertical arrow (mobile) */}
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        className={`${iconSize[size]} text-gray-600 transition-transform duration-300 md:hidden ${
-          isRotated ? 'rotate-180' : ''
-        }`}
+        className={`
+          ${iconSize[size]} text-gray-600 
+          transition-transform duration-300
+          block md:hidden
+          ${isRotated ? 'rotate-180' : ''}
+        `}
         fill="none"
         viewBox="0 0 24 24"
         stroke="currentColor"
+        strokeWidth={1.5}
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={verticalArrow} />
+        <path strokeLinecap="round" strokeLinejoin="round" d={verticalArrow} />
       </svg>
     </button>
   );

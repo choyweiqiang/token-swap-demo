@@ -24,15 +24,17 @@ export default function ChainSwitcher({
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-sm font-medium text-gray-700 text-center">Select chains</h2>
+      <h2 className="text-sm font-medium text-gray-700 text-center mb-2 font-mono tracking-wider">
+        Select chains
+      </h2>
 
-      <div className="bg-white p-2 rounded-lg shadow-lg border border-gray-200 flex items-center">
+      <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center">
         <div className="flex flex-wrap gap-2 max-w-md">
           {CHAIN_CONFIG.map((chain) => (
             <button
               key={chain.id}
               onClick={() => toggleChain(chain.id)}
-              className={`px-3 py-1 text-sm rounded-full border flex items-center transition-all ${
+              className={`px-3 py-1 text-xs rounded-full border flex items-center transition-all font-mono tracking-tight ${
                 selectedChainIds.includes(chain.id)
                   ? 'bg-blue-50 border-blue-300 text-blue-700'
                   : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
