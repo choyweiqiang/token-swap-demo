@@ -5,6 +5,8 @@ interface PopoverOption {
   label: string;
   symbol?: string;
   icon?: string;
+  chainName?: string;
+  chainIcon?: string;
 }
 
 interface PopoverProps {
@@ -19,6 +21,8 @@ interface PopoverProps {
   disabled?: boolean;
   placement?: 'bottom' | 'top';
   searchPlaceholder?: string;
+  maxWidth?: string;
+  minWidth?: string;
 }
 
 export default function Popover({
@@ -33,6 +37,8 @@ export default function Popover({
   disabled = false,
   placement = 'bottom',
   searchPlaceholder = 'Search',
+  maxWidth = '24rem',
+  minWidth = '16rem',
 }: PopoverProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -127,6 +133,7 @@ export default function Popover({
           className={`absolute z-20 w-64 ${
             placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
           } bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden ${popoverClassName}`}
+          style={{ minWidth, maxWidth, width: 'auto' }}
         >
           <div className="p-2 border-b border-gray-200">
             <div className="relative">
@@ -167,14 +174,26 @@ export default function Popover({
                   onClick={() => handleSelect(option)}
                 >
                   <img
-                    src={option.icon || '/chain-placeholder.svg'}
+                    src={option.icon || '/unknown-logo.png'}
                     alt=""
                     className="w-6 h-6 mr-3 rounded-full"
                   />
-                  <div className="text-left">
+                  <div className="text-left flex-1">
                     <div className="font-medium text-gray-900">{option.symbol || option.label}</div>
                     {option.symbol && <div className="text-xs text-gray-500">{option.label}</div>}
                   </div>
+                  {option.chainName && (
+                    <div className="flex items-center ml-2">
+                      <span className="text-xs text-gray-500 mr-1">{option.chainName}</span>
+                      {option.chainIcon && (
+                        <img
+                          src={option.chainIcon}
+                          alt={option.chainName}
+                          className="w-4 h-4 rounded-full"
+                        />
+                      )}
+                    </div>
+                  )}
                 </button>
               ))
             ) : (

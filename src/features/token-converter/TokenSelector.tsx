@@ -4,6 +4,7 @@ import useTokenInfo from './hooks/useTokenInfo';
 import { Skeleton } from '../../ui/loading/Skeleton';
 import type { Erc20AssetInfo } from '@funkit/api-base';
 import Popover from '../../ui/form/Popover';
+import { CHAIN_CONFIG } from '../../const/chains';
 
 function TokenSelect({
   tokens,
@@ -15,26 +16,31 @@ function TokenSelect({
   onTokenSelect: (token: Token) => void;
 }) {
   const options = tokens.map((token) => ({
-    value: token.symbol,
+    value: token.id,
     label: token.name,
     symbol: token.symbol,
-    icon: token.icon
-      ? `https://icons.llamao.fi/icons/chains/rsz_${token.icon}.jpg`
+    icon: token.icon || '/unknown-logo.png',
+    chainName: token.chainName,
+    chainIcon: CHAIN_CONFIG.find((c) => c.id === token.chainId)?.icon
+      ? `https://icons.llamao.fi/icons/chains/rsz_${CHAIN_CONFIG.find((c) => c.id === token.chainId)?.icon}.jpg`
       : '/unknown-logo.png',
   }));
 
   return (
     <Popover
       options={options}
-      value={selectedToken?.symbol || ''}
+      value={selectedToken?.id || ''}
       onChange={(val) => {
-        const token = tokens.find((t) => t.symbol === val);
+        const token = tokens.find((t) => t.id === val);
         if (token) onTokenSelect(token);
       }}
       placeholder="Select token"
+      searchPlaceholder="Search token"
       buttonClassName="select-focus border-gray-300 hover:border-blue-500 transition focus:outline-none focus-visible:shadow-[0_0_0_3px_rgba(59,130,246,0.15)] focus-visible:border-blue-500"
       popoverClassName="shadow-xl"
       optionClassName="hover:bg-blue-50"
+      minWidth="20rem"
+      maxWidth="30rem"
     />
   );
 }
@@ -92,7 +98,7 @@ export default function TokenSelector({
   oppositeToken: Token | null;
   amount: string;
 }) {
-  const availableTokens = tokens.filter((token) => token.symbol !== oppositeToken?.symbol);
+  const availableTokens = tokens.filter((token) => token.id !== oppositeToken?.id);
 
   const { data: tokenInfo } = useTokenInfo({
     chainId: selectedToken?.chainId,
