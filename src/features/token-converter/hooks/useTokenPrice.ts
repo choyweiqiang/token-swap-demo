@@ -12,7 +12,7 @@ export default function useTokenPrice({
     queryKey: ['tokenPrice', chainId, tokenAddress],
     queryFn: () => fetchTokenPrice({ chainId: chainId!, assetTokenAddress: tokenAddress! }),
     enabled: !!tokenAddress,
-    staleTime: 30 * 1000, // Refresh price every 30 seconds
-    refetchInterval: 30 * 1000,
+    staleTime: 10 * 1000, // Refresh price every 10 seconds
+    refetchInterval: 10 * 1000,
   });
 }

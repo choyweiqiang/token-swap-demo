@@ -68,6 +68,7 @@ export default function TokenConverter({
             onTokenSelect={(token) => handleTokenSelect('from', token)}
             oppositeToken={toToken}
             amount={amount}
+            label="You Pay"
           />
         </div>
 
@@ -85,6 +86,7 @@ export default function TokenConverter({
             onTokenSelect={(token) => handleTokenSelect('to', token)}
             oppositeToken={fromToken}
             amount={amount}
+            label="You Receive"
           />
         </div>
       </div>

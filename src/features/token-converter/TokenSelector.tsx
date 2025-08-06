@@ -5,6 +5,8 @@ import { Skeleton } from '../../ui/loading/Skeleton';
 import type { Erc20AssetInfo } from '@funkit/api-base';
 import Popover from '../../ui/form/Popover';
 import { CHAIN_CONFIG } from '../../const/chains';
+import { useEffect, useState } from 'react';
+import InformationCircleIcon from '../../assets/icons/InformationCircleIcon';
 
 function TokenSelect({
   tokens,
@@ -36,8 +38,8 @@ function TokenSelect({
       }}
       placeholder="Select token"
       searchPlaceholder="Search token"
-      buttonClassName="w-full h-10 border border-gray-300 rounded-md px-3 py-2 hover:border-blue-500 transition focus:outline-none focus:ring-2 focus:ring-blue-500"
-      popoverClassName="shadow-xl border border-gray-200"
+      buttonClassName="w-full h-10 border border-gray-200 rounded-lg px-3 py-2 hover:border-blue-500 transition focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-sm"
+      popoverClassName="shadow-xl border border-gray-200 bg-white"
       optionClassName="hover:bg-blue-50"
       minWidth="20rem"
       maxWidth="30rem"
@@ -55,12 +57,12 @@ function PriceDisplay({
   tokenAmount: number;
 }) {
   if (!tokenInfo || isLoading) {
-    return <Skeleton className="h-5 w-24" />;
+    return <Skeleton className="h-5 w-full" />;
   }
 
   return (
-    <div className="text-sm text-gray-600 font-mono tracking-tight">
-      ≈ {tokenAmount} {tokenInfo.symbol}
+    <div className="text-sm text-gray-600 font-mono tracking-tight mt-2">
+      ≈ {tokenAmount.toFixed(6)} {tokenInfo.symbol}
     </div>
   );
 }
@@ -69,18 +71,59 @@ function PriceDisclaimer({
   tokenInfo,
   isLoading,
   unitPrice,
+  priceDifference,
 }: {
   tokenInfo?: Erc20AssetInfo;
   isLoading: boolean;
   unitPrice?: number;
+  priceDifference?: {
+    value: number;
+    percent: number;
+    trend: 'up' | 'down';
+  };
 }) {
+  const [showChangeIndicator, setShowChangeIndicator] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (priceDifference && priceDifference.value !== 0) {
+      setShowChangeIndicator(true);
+      const timer = setTimeout(() => setShowChangeIndicator(false), 1000); // Fades after 1 second
+      return () => clearTimeout(timer);
+    }
+  }, [priceDifference]);
+
   if (!tokenInfo || isLoading) {
-    return <Skeleton className="h-4 w-32 mt-1" />;
+    return <Skeleton className="h-4 w-full mt-1" />;
   }
 
   return (
-    <div className="text-xs text-gray-500 font-mono tracking-tight">
-      1 {tokenInfo.symbol} = ${unitPrice?.toFixed(6) || '0.00'}
+    <div className="flex items-center justify-between text-xs text-gray-400 font-mono tracking-tight mt-1">
+      <div className="flex items-center gap-1">
+        <InformationCircleIcon />
+        <span>
+          1 {tokenInfo.symbol} = ${unitPrice?.toFixed(6) || '0.00'}
+        </span>
+        {showChangeIndicator && (
+          <span
+            className={`ml-1 h-1 w-1 rounded-full ${
+              priceDifference?.trend === 'up' ? 'bg-green-500' : 'bg-red-500'
+            } opacity-0 animate-[fadeOut_1s_ease-out_forwards]`}
+          />
+        )}
+      </div>
+
+      {priceDifference && priceDifference.value !== 0 && (
+        <div className="flex items-center gap-2">
+          <span className={`${priceDifference.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+            {priceDifference.trend === 'up' ? '+' : '-'}$
+            {Math.abs(priceDifference.value).toFixed(2)}
+          </span>
+          <span className={`${priceDifference.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
+            ({priceDifference.trend === 'up' ? '+' : ''}
+            {priceDifference.percent.toFixed(2)}%)
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -91,14 +134,22 @@ export default function TokenSelector({
   onTokenSelect,
   oppositeToken,
   amount,
+  label,
 }: {
   tokens: Token[];
   selectedToken: Token | null;
   onTokenSelect: (token: Token | null) => void;
   oppositeToken: Token | null;
   amount: string;
+  label: string;
 }) {
   const availableTokens = tokens.filter((token) => token.id !== oppositeToken?.id);
+  const [previousPrice, setPreviousPrice] = useState<number | null>(null);
+  const [priceDifference, setPriceDifference] = useState<{
+    value: number;
+    percent: number;
+    trend: 'up' | 'down';
+  } | null>(null);
 
   const { data: tokenInfo } = useTokenInfo({
     chainId: selectedToken?.chainId,
@@ -112,19 +163,60 @@ export default function TokenSelector({
 
   const tokenAmount = amount ? parseFloat(amount) / (price?.unitPrice || 6) : 0;
 
+  useEffect(() => {
+    if (price?.unitPrice) {
+      if (previousPrice !== null && previousPrice !== price.unitPrice) {
+        const valueDiff = price.unitPrice - previousPrice;
+        const percentDiff = (valueDiff / previousPrice) * 100;
+
+        setPriceDifference({
+          value: valueDiff,
+          percent: percentDiff,
+          trend: valueDiff >= 0 ? 'up' : 'down',
+        });
+      }
+      setPreviousPrice(price.unitPrice);
+    }
+  }, [price?.unitPrice]);
+
   return (
-    <div className="flex flex-col gap-2 p-3">
+    <div className="flex flex-col gap-3 p-4 border border-gray-200 rounded-lg bg-white shadow-sm">
+      <div className="flex justify-between items-center">
+        <span className="text-xs font-medium text-gray-500 uppercase tracking-wider">{label}</span>
+        {selectedToken && (
+          <div className="flex items-center">
+            <span className="text-xs text-gray-500 font-mono">{selectedToken.chainName}</span>
+            <img
+              src={`https://icons.llamao.fi/icons/chains/rsz_${CHAIN_CONFIG.find((c) => c.id === selectedToken.chainId)?.icon}.jpg`}
+              alt={selectedToken.chainName}
+              className="w-4 h-4 rounded-full ml-2"
+            />
+          </div>
+        )}
+      </div>
+
       <TokenSelect
         tokens={availableTokens}
         selectedToken={selectedToken}
         onTokenSelect={onTokenSelect}
       />
-      <PriceDisplay tokenInfo={tokenInfo} tokenAmount={tokenAmount} isLoading={isLoadingPrice} />
-      <PriceDisclaimer
-        tokenInfo={tokenInfo}
-        unitPrice={price?.unitPrice}
-        isLoading={isLoadingPrice}
-      />
+
+      {selectedToken && (
+        <>
+          <PriceDisplay
+            tokenInfo={tokenInfo}
+            tokenAmount={tokenAmount}
+            isLoading={isLoadingPrice}
+          />
+
+          <PriceDisclaimer
+            tokenInfo={tokenInfo}
+            unitPrice={price?.unitPrice}
+            isLoading={isLoadingPrice}
+            priceDifference={priceDifference || undefined}
+          />
+        </>
+      )}
     </div>
   );
 }

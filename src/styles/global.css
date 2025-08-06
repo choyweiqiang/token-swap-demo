@@ -105,3 +105,13 @@ select {
 .animate-spin-reverse {
   animation: spin-reverse 2s linear infinite;
 }
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
