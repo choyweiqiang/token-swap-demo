@@ -35,7 +35,6 @@ export default function TokenConverter({
   const [amount, setAmount] = useState<string>('');
   const { data: tokens, isLoading, error } = useCoinGeckoTokens({ chainIds });
 
-  // Price difference states
   const [fromPriceDiff, setFromPriceDiff] = useState<PriceDifference | null>(null);
   const [toPriceDiff, setToPriceDiff] = useState<PriceDifference | null>(null);
   const [prevFromPrice, setPrevFromPrice] = useState<number | null>(null);
@@ -44,7 +43,6 @@ export default function TokenConverter({
   const fromToken = tokens?.find((t) => t.id === tokenSelections.from.tokenId) || null;
   const toToken = tokens?.find((t) => t.id === tokenSelections.to.tokenId) || null;
 
-  // Handle price updates from TokenSelectors
   const handleFromPriceUpdate = (newPrice: number) => {
     calculatePriceDifference(newPrice, prevFromPrice, setFromPriceDiff);
     setPrevFromPrice(newPrice);
@@ -55,7 +53,6 @@ export default function TokenConverter({
     setPrevToPrice(newPrice);
   };
 
-  // Reset prices when tokens change
   useEffect(() => {
     setPrevFromPrice(null);
     setFromPriceDiff(null);
@@ -66,7 +63,6 @@ export default function TokenConverter({
     setToPriceDiff(null);
   }, [toToken?.id]);
 
-  // Helper function for price difference calculation
   const calculatePriceDifference = (
     newPrice: number,
     prevPrice: number | null,
@@ -96,6 +92,14 @@ export default function TokenConverter({
         tokenId: token?.id || null,
       },
     });
+
+    if (token) {
+      // @ts-expect-error - Using the global function exposed by RecentlyUsedTokens
+      if (window.addToRecentlyUsed) {
+        // @ts-expect-error - ignore
+        window.addToRecentlyUsed(token);
+      }
+    }
   };
 
   const handleSwapTokens = () => {

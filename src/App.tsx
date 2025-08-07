@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import TokenConverter from './features/token-converter/TokenConverter';
 import './styles/global.css';
 import ChainSwitcher from './features/chain-switcher/ChainSwitcher';
 import { ThemeToggle } from './ui/theme/ThemeToggle';
+import RecentlyUsedTokens from './features/token-converter/RecentlyUsedTokens';
+import type { Token } from './types/tokens';
 
 interface TokenSelection {
   chainId: string;
@@ -45,6 +47,20 @@ function App() {
     }));
   };
 
+  const activeTokenIds = [tokenSelections.from.tokenId, tokenSelections.to.tokenId].filter(
+    Boolean,
+  ) as string[];
+
+  const handleRecentTokenSelect = useCallback((token: Token) => {
+    setTokenSelections((prev) => ({
+      ...prev,
+      to: {
+        chainId: token.chainId,
+        tokenId: token.id,
+      },
+    }));
+  }, []);
+
   return (
     <div className="flex flex-col justify-center items-center min-h-screen p-4 gap-6">
       <div className="fixed top-4 right-4">
@@ -71,6 +87,8 @@ function App() {
         onTokenSelect={setTokenSelections}
         className="w-full max-w-3xl"
       />
+
+      <RecentlyUsedTokens activeTokenIds={activeTokenIds} onTokenSelect={handleRecentTokenSelect} />
     </div>
   );
 }

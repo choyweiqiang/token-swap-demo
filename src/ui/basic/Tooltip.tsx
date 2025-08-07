@@ -62,9 +62,9 @@ export default function Tooltip({
           <div
             className={`
             fixed z-[99999] px-3 py-1.5 text-sm rounded
-            bg-gray-50/95 backdrop-blur-sm
-            border border-gray-200 shadow-sm
-            text-gray-700
+            bg-[var(--color-card)]/95 backdrop-blur-sm
+            border border-[var(--color-border)] shadow-sm
+            text-[var(--color-text)]
           `}
             style={{
               left: `${coords.x}px`,
@@ -74,7 +74,7 @@ export default function Tooltip({
             }}
           >
             {content}
-            {/* Arrow with perfect concealment */}
+
             <div
               className={`
             absolute w-3 h-3 
@@ -87,11 +87,11 @@ export default function Tooltip({
             >
               <div
                 className={`
-              absolute w-full h-full bg-gray-50/95 backdrop-blur-sm
+              absolute w-full h-full bg-[var(--color-card)]/95 backdrop-blur-sm
               ${
                 position === 'top'
-                  ? 'border-b border-r border-gray-200 rotate-45'
-                  : 'border-t border-l border-gray-200 rotate-45'
+                  ? 'border-b border-r border-[var(--color-border)] rotate-45'
+                  : 'border-t border-l border-[var(--color-border)] rotate-45'
               }
             `}
               />
