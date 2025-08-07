@@ -65,7 +65,11 @@ function PriceDisplay({
   tokenAmount: number;
 }) {
   if (!tokenInfo || isLoading) {
-    return <Skeleton className="h-5 w-full" />;
+    return (
+      <div className="w-full">
+        <Skeleton className="h-5 w-full" />
+      </div>
+    );
   }
 
   const amount = `${formatAmount(tokenAmount)} ${tokenInfo.symbol}`;
@@ -105,14 +109,18 @@ function PriceDisclaimer({
   }, [priceDifference]);
 
   if (!tokenInfo || isLoading) {
-    return <Skeleton className="h-4 w-full mt-1" />;
+    return (
+      <div className="w-full mt-1">
+        <Skeleton className="h-4 w-full" />
+      </div>
+    );
   }
 
   return (
-    <div className="flex items-center justify-between text-xs text-gray-400 font-mono tracking-tight mt-1">
-      <div className="flex items-center gap-1">
-        <InformationCircleIcon />
-        <span>
+    <div className="flex items-center justify-between text-[0.625rem] leading-[1rem] text-gray-400 font-mono tracking-tight mt-1">
+      <div className="flex items-center gap-1 flex-1 min-w-0">
+        <InformationCircleIcon className="h-[0.625rem]" />
+        <span className="whitespace-nowrap">
           1 {tokenInfo.symbol} = ${unitPrice?.toFixed(6) || '0.00'}
         </span>
         {showChangeIndicator && (
@@ -125,15 +133,21 @@ function PriceDisclaimer({
       </div>
 
       {priceDifference && priceDifference.value !== 0 && (
-        <div className="flex items-center gap-2">
-          <span className={`${priceDifference.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
-            {priceDifference.trend === 'up' ? '+' : '-'}$
-            {Math.abs(priceDifference.value).toFixed(2)}
-          </span>
-          <span className={`${priceDifference.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}>
-            ({priceDifference.trend === 'up' ? '+' : ''}
-            {priceDifference.percent.toFixed(2)}%)
-          </span>
+        <div className="flex items-center gap-2 flex-shrink-0 sm:pl-2">
+          <div className="flex items-center gap-2">
+            <span
+              className={`${priceDifference.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}
+            >
+              {priceDifference.trend === 'up' ? '+' : '-'}$
+              {Math.abs(priceDifference.value).toFixed(2)}
+            </span>
+            <span
+              className={`${priceDifference.trend === 'up' ? 'text-green-400' : 'text-red-400'}`}
+            >
+              ({priceDifference.trend === 'up' ? '+' : ''}
+              {priceDifference.percent.toFixed(2)}%)
+            </span>
+          </div>
         </div>
       )}
     </div>
@@ -147,6 +161,8 @@ export default function TokenSelector({
   oppositeToken,
   amount,
   label,
+  onPriceUpdate,
+  priceDifference,
 }: {
   tokens?: Token[];
   selectedToken: Token | null;
@@ -154,14 +170,14 @@ export default function TokenSelector({
   oppositeToken: Token | null;
   amount: string;
   label: string;
-}) {
-  const availableTokens = tokens.filter((token) => token.id !== oppositeToken?.id);
-  const [previousPrice, setPreviousPrice] = useState<number | null>(null);
-  const [priceDifference, setPriceDifference] = useState<{
+  onPriceUpdate?: (price: number) => void; // New callback
+  priceDifference?: {
     value: number;
     percent: number;
     trend: 'up' | 'down';
-  } | null>(null);
+  };
+}) {
+  const availableTokens = tokens.filter((token) => token.id !== oppositeToken?.id);
 
   const { data: tokenInfo, error: tokenInfoError } = useTokenInfo({
     chainId: selectedToken?.chainId,
@@ -177,30 +193,15 @@ export default function TokenSelector({
     tokenAddress: tokenInfo?.address,
   });
 
-  const error = tokenInfoError?.message || errorPrice?.message;
+  // Notify parent when price updates
+  useEffect(() => {
+    if (price?.unitPrice && onPriceUpdate) {
+      onPriceUpdate(price.unitPrice);
+    }
+  }, [price?.unitPrice, onPriceUpdate]);
 
   const tokenAmount = amount && price?.unitPrice ? parseFloat(amount) / price.unitPrice : 0;
-
-  useEffect(() => {
-    if (price?.unitPrice) {
-      // Only calculate difference if we have a valid previous price (> 0)
-      if (previousPrice !== null && previousPrice > 0 && previousPrice !== price.unitPrice) {
-        const valueDiff = price.unitPrice - previousPrice;
-        const percentDiff = previousPrice !== 0 ? (valueDiff / previousPrice) * 100 : 0;
-
-        const MIN_PRICE_CHANGE = 0.01; // 1%
-
-        if (Math.abs(percentDiff) >= MIN_PRICE_CHANGE) {
-          setPriceDifference({
-            value: valueDiff,
-            percent: percentDiff,
-            trend: valueDiff >= 0 ? 'up' : 'down',
-          });
-        }
-      }
-      setPreviousPrice(price.unitPrice);
-    }
-  }, [price?.unitPrice]);
+  const error = tokenInfoError?.message || errorPrice?.message;
 
   return (
     <>
@@ -225,7 +226,7 @@ export default function TokenSelector({
         </div>
 
         <div className="flex justify-between items-center gap-3 w-full min-w-0">
-          <div className="min-w-[120px] max-w-[50%] overflow-hidden">
+          <div className="min-w-0 flex-1 overflow-hidden">
             <PriceDisplay
               tokenInfo={tokenInfo}
               tokenAmount={tokenAmount}
