@@ -37,7 +37,7 @@ export default function SwapButton({ onClick, size = 'md', className = '' }: Swa
       onClick={handleClick}
       className={`
         rounded-full border border-gray-200 
-        bg-white hover:bg-gray-50 
+        hover:bg-gray-50 
         transition-all duration-200
         shadow-sm hover:shadow-md
         ${sizeClasses[size]} 

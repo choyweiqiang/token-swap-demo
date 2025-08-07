@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import TokenConverter from './features/token-converter/TokenConverter';
 import './styles/global.css';
 import ChainSwitcher from './features/chain-switcher/ChainSwitcher';
+import { ThemeToggle } from './ui/theme/ThemeToggle';
 
 interface TokenSelection {
   chainId: string;
@@ -46,8 +47,17 @@ function App() {
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen p-4 gap-6">
+      <div className="fixed top-4 right-4">
+        <ThemeToggle />
+      </div>
+
       <div className="text-center">
-        <h1 className="text-2xl font-semibold mb-2">Token Price Explorer</h1>
+        <h1
+          className="text-2xl font-semibold mb-2 text-gray-900 transition-colors duration-100"
+          style={{ color: ' var(--color-text)' }}
+        >
+          Token Price Explorer
+        </h1>
         <p className="text-gray-500 mb-6">
           Explore crypto token values and see real-time conversion rates
         </p>

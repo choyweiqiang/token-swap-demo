@@ -8,10 +8,47 @@
 :root {
   --font-main: 'Space Grotesk', -apple-system, sans-serif;
   --font-mono: 'IBM Plex Mono', monospace;
+
+  /* Light theme colors */
+  --color-bg: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-text: #111827;
+  --color-text-secondary: #6b7280;
+  --color-border: #e5e7eb;
+  --color-primary: #3b82f6;
+  --color-primary-hover: #2563eb;
+  --color-card: #ffffff;
+  --color-card-hover: #f9fafb;
+  --color-input-bg: #ffffff;
+  --color-input-border: #e5e7eb;
+  --color-error: #ef4444;
+  --color-success: #10b981;
+}
+
+:root.dark {
+  /* Dark theme colors */
+  --color-bg: #0f172a;
+  --color-bg-secondary: #1e293b;
+  --color-text: #f8fafc;
+  --color-text-secondary: #94a3b8;
+  --color-border: #334155;
+  --color-primary: #60a5fa;
+  --color-primary-hover: #3b82f6;
+  --color-card: #1e293b;
+  --color-card-hover: #334155;
+  --color-input-bg: #1e293b;
+  --color-input-border: #334155;
+  --color-error: #f87171;
+  --color-success: #34d399;
 }
 
 body {
   font-family: var(--font-main);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
 
 h1,
@@ -61,17 +98,23 @@ select {
 }
 
 .token-card {
+  background-color: var(--color-card);
+  border-color: var(--color-border);
   transition: all 0.2s ease;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
 }
 
 .token-card:hover {
+  background-color: var(--color-card-hover);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   transform: translateY(-1px);
 }
 
 .input-focus,
 .select-focus {
+  background-color: var(--color-input-bg);
+  border-color: var(--color-input-border);
+  color: var(--color-text);
   transition: box-shadow 0.1s ease;
 }
 
@@ -79,7 +122,7 @@ select {
 .select-focus:focus {
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
   outline: 2px solid transparent;
-  border-color: #3b82f6;
+  border-color: var(--color-primary);
 }
 
 @keyframes spin-slow {

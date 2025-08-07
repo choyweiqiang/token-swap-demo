@@ -6,7 +6,7 @@ export default function Input({
   disabled = false,
   error = '',
   prefix,
-  baseClasses = 'w-full h-10 border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition text-gray-700 font-normal',
+  baseClasses = 'w-full h-10 border rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition text-[var(--color-text)] font-normal',
   disabledClasses = 'bg-gray-50 cursor-not-allowed opacity-80',
   ...props
 }: Omit<InputProps, 'prefix'> & {
@@ -17,14 +17,16 @@ export default function Input({
   return (
     <div className={`relative ${className}`}>
       {prefix && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
           {prefix}
         </div>
       )}
       <input
         className={`no-spinner ${baseClasses} ${prefix ? 'pl-14' : ''} ${
-          disabled ? disabledClasses : 'bg-white'
-        } ${error ? 'border-red-500 focus:ring-red-500' : ''}`}
+          disabled ? disabledClasses : ''
+        } border-gray-200 ${
+          error ? 'border-red-500 focus:ring-red-500' : ''
+        } text-[var(--color-text)]`}
         disabled={disabled}
         {...props}
       />

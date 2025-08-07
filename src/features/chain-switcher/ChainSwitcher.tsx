@@ -24,11 +24,11 @@ export default function ChainSwitcher({
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-sm font-medium text-gray-700 text-center mb-2 font-mono tracking-wider">
+      <h2 className="text-sm font-medium text-[var(--color-card-secondary)] text-center mb-2 font-mono tracking-wider">
         Select chains
       </h2>
 
-      <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow-sm border border-gray-200 flex items-center">
+      <div className="w-full max-w-4xl p-4 rounded-lg shadow-sm border border-gray-200 flex items-center">
         <div className="flex flex-wrap gap-2 max-w-md">
           {CHAIN_CONFIG.map((chain) => (
             <button
@@ -37,7 +37,7 @@ export default function ChainSwitcher({
               className={`px-3 py-1 text-xs rounded-full border flex items-center transition-all font-mono tracking-tight ${
                 selectedChainIds.includes(chain.id)
                   ? 'bg-blue-50 border-blue-300 text-blue-700'
-                  : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'
+                  : 'border-gray-200 text-[var(--color-text)] hover:bg-[var(--color-card-hover)]'
               }`}
             >
               <img

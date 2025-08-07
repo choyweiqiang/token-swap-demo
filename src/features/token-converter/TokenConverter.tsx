@@ -107,7 +107,7 @@ export default function TokenConverter({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center w-full max-w-3xl p-6 border border-gray-200 rounded-lg shadow-sm bg-white">
+      <div className="flex justify-center w-full max-w-3xl p-6 border border-gray-200 rounded-lg shadow-sm">
         <Spinner />
       </div>
     );
@@ -117,7 +117,11 @@ export default function TokenConverter({
     <>
       {error ? <ErrorAlert message={error.message} /> : null}
       <div
-        className={`w-full max-w-3xl bg-white p-6 rounded-lg shadow-sm border border-gray-200 ${className}`}
+        className={`
+      w-full max-w-3xl p-6 rounded-lg shadow-sm
+       border border-gray-200
+  ${className}
+    `}
       >
         <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="flex-1">
@@ -154,7 +158,7 @@ export default function TokenConverter({
           </div>
         </div>
 
-        <div className="border-t border-gray-100 pt-4">
+        <div className="border-t border-gray-200 pt-4">
           <TokenInput value={amount} onChange={setAmount} />
         </div>
       </div>

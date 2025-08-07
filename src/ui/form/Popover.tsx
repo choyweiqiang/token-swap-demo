@@ -98,7 +98,7 @@ export default function Popover({
     <div className={`relative ${className}`} ref={popoverRef}>
       <button
         type="button"
-        className={`inline-flex items-center justify-between px-3 py-2.5 text-sm bg-white border border-gray-200 rounded-lg hover:bg-gray-50 ${
+        className={`inline-flex items-center justify-between px-3 py-2.5 text-sm border border-gray-200 rounded-lg ${
           disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
         } ${buttonClassName}`}
         onClick={() => !disabled && setIsOpen(!isOpen)}
@@ -132,10 +132,12 @@ export default function Popover({
 
       {isOpen && (
         <div
-          className={`absolute z-20 ${align === 'right' ? 'right-0' : 'left-0'} ${
+          className={`absolute z-20 rounded-lg shadow-lg border border-gray-200 ${
+            align === 'right' ? 'right-0' : 'left-0'
+          } ${
             placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
-          } bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden ${popoverClassName}`}
-          style={{ minWidth, maxWidth }}
+          } overflow-hidden ${popoverClassName}`}
+          style={{ minWidth, maxWidth, backgroundColor: 'var(--color-bg)' }}
         >
           <div className="p-2 border-b border-gray-200">
             <div className="relative">
@@ -146,6 +148,7 @@ export default function Popover({
                 placeholder={searchPlaceholder}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ backgroundColor: 'var(--color-bg)' }}
               />
               <svg
                 className="absolute left-2.5 top-1/2 h-4 w-4 text-gray-400 -translate-y-1/2"
@@ -170,8 +173,8 @@ export default function Popover({
                 <button
                   key={option.value}
                   type="button"
-                  className={`flex items-center w-full px-3 py-2.5 text-sm hover:bg-gray-50 ${
-                    selectedOption?.value === option.value ? 'bg-gray-100' : ''
+                  className={`flex items-center w-full px-3 py-2.5 text-sm ${
+                    selectedOption?.value === option.value ? 'bg-[var(--color-bg-secondary)]' : ''
                   } ${optionClassName}`}
                   onClick={() => handleSelect(option)}
                 >
@@ -181,7 +184,12 @@ export default function Popover({
                     className="w-6 h-6 mr-3 rounded-full"
                   />
                   <div className="text-left flex-1">
-                    <div className="font-medium text-gray-900">{option.symbol || option.label}</div>
+                    <div
+                      className="font-medium transition-colors duration-100"
+                      style={{ color: ' var(--color-text)' }}
+                    >
+                      {option.symbol || option.label}
+                    </div>
                     {option.symbol && <div className="text-xs text-gray-500">{option.label}</div>}
                   </div>
                   {option.chainName && (

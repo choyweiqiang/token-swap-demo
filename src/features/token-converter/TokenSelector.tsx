@@ -46,8 +46,8 @@ function TokenSelect({
       placeholder="Select token"
       searchPlaceholder="Search token"
       buttonClassName="w-full h-10 border border-gray-200 rounded-lg px-3 py-2 hover:border-blue-500 transition focus:outline-none focus:ring-1 focus:ring-blue-500 font-mono text-sm"
-      popoverClassName="shadow-xl border border-gray-200 bg-white"
-      optionClassName="hover:bg-blue-50"
+      popoverClassName="shadow-xl border border-gray-200"
+      optionClassName="hover:[background:var(--color-card-hover)]"
       minWidth="18rem"
       maxWidth="26rem"
       align="right"
@@ -76,7 +76,7 @@ function PriceDisplay({
 
   return (
     <Tooltip content={amount}>
-      <div className="text-sm text-gray-600 font-mono tracking-tight mt-2 truncate overflow-ellipsis">
+      <div className="text-sm transition-colors duration-100 text-[var(--color-text)] font-mono tracking-tight mt-2 truncate overflow-ellipsis">
         {amount}
       </div>
     </Tooltip>
@@ -206,9 +206,9 @@ export default function TokenSelector({
   return (
     <>
       {error ? <ErrorAlert message={error} /> : null}
-      <div className="flex flex-col gap-3 p-4 border border-gray-200 rounded-lg bg-white shadow-sm w-full min-w-0">
+      <div className="flex flex-col gap-3 p-4 border border-gray-200 rounded-lg shadow-sm w-full min-w-0">
         <div className="flex justify-between items-center min-w-0">
-          <span className="text-xs font-medium text-gray-500 uppercase tracking-wider truncate">
+          <span className="text-xs font-medium transition-colors duration-100 text-[var(--color-text-secondary)] uppercase tracking-wider truncate">
             {label}
           </span>
           {selectedToken && (
