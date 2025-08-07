@@ -27,6 +27,8 @@ function App() {
       : { from: { chainId: '', tokenId: null }, to: { chainId: '', tokenId: null } };
   });
 
+  const [apiError, setApiError] = useState<Error | null>(null);
+
   useEffect(() => {
     localStorage.setItem('selectedChains', JSON.stringify(selectedChainIds));
     localStorage.setItem('tokenSelections', JSON.stringify(tokenSelections));
@@ -85,10 +87,16 @@ function App() {
         chainIds={selectedChainIds}
         tokenSelections={tokenSelections}
         onTokenSelect={setTokenSelections}
+        onError={setApiError}
         className="w-full max-w-3xl"
       />
 
-      <RecentlyUsedTokens activeTokenIds={activeTokenIds} onTokenSelect={handleRecentTokenSelect} />
+      <RecentlyUsedTokens
+        activeTokenIds={activeTokenIds}
+        onTokenSelect={handleRecentTokenSelect}
+        selectedChainIds={selectedChainIds}
+        apiError={apiError}
+      />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import type { Token } from '../../types/tokens';
 import useTokenPrice from './hooks/useTokenPrice';
 import useTokenInfo from './hooks/useTokenInfo';
@@ -28,7 +28,6 @@ interface RecentToken extends Token {
   } | null;
 }
 
-// Register ChartJS components
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -43,11 +42,15 @@ ChartJS.register(
 interface RecentlyUsedTokensProps {
   activeTokenIds: string[];
   onTokenSelect: (token: Token) => void;
+  selectedChainIds: string[];
+  apiError?: Error | null;
 }
 
 export default function RecentlyUsedTokens({
   activeTokenIds,
   onTokenSelect,
+  selectedChainIds,
+  apiError,
 }: RecentlyUsedTokensProps) {
   const [warningMessage, setWarningMessage] = useState<string | null>(null);
   const [recentTokens, setRecentTokens] = useState<RecentToken[]>(() => {
@@ -117,6 +120,18 @@ export default function RecentlyUsedTokens({
       return;
     }
 
+    if (selectedChainIds.length === 0) {
+      setWarningMessage(`Please select at least one chain before selecting a token`);
+      setTimeout(() => setWarningMessage(null), 3000);
+      return;
+    }
+
+    if (!selectedChainIds.includes(token.chainId)) {
+      setWarningMessage(`${token.name} is on ${token.chainName} which is not currently selected`);
+      setTimeout(() => setWarningMessage(null), 3000);
+      return;
+    }
+
     addToRecentlyUsed(token);
 
     onTokenSelect(token);
@@ -125,6 +140,12 @@ export default function RecentlyUsedTokens({
   return (
     <div className="w-full max-w-3xl mt-6 p-6 rounded-lg shadow-sm border border-gray-200">
       {warningMessage && <WarningAlert message={warningMessage} />}
+      {apiError && (
+        <WarningAlert
+          message="Unable to fetch token data. Some features may be limited."
+          autoDismiss={false}
+        />
+      )}
       <h2 className="text-sm font-medium mb-4 text-[var(--color-text-secondary)] uppercase tracking-wider">
         Recently Used Tokens
       </h2>
@@ -136,6 +157,8 @@ export default function RecentlyUsedTokens({
             isActive={activeTokenIds.includes(token.id)}
             onSelect={() => handleTokenSelect(token)}
             updateToken={updateToken}
+            isChainSelected={selectedChainIds.includes(token.chainId)}
+            isApiError={!!apiError}
           />
         ))}
       </div>
@@ -148,11 +171,15 @@ function TokenCard({
   isActive,
   onSelect,
   updateToken,
+  isChainSelected = true,
+  isApiError = false,
 }: {
   token: RecentToken;
   isActive: boolean;
   onSelect: () => void;
   updateToken: (tokenId: string, updates: Partial<RecentToken>) => void;
+  isChainSelected?: boolean;
+  isApiError?: boolean;
 }) {
   const [priceHistory, setPriceHistory] = useState<number[]>(token.priceHistory || []);
 
@@ -176,7 +203,7 @@ function TokenCard({
     }
   }, [price?.unitPrice]);
 
-  const priceChange = calculatePriceChange(priceHistory);
+  const priceChange = useMemo(() => calculatePriceChange(priceHistory), [priceHistory]);
 
   useEffect(() => {
     if (price?.unitPrice) {
@@ -186,19 +213,34 @@ function TokenCard({
         priceChange,
       });
     }
-  }, [token.id, priceHistory, price?.unitPrice, priceChange, updateToken]);
+  }, [token.id, price?.unitPrice, updateToken]);
 
   const chainIcon = CHAIN_CONFIG.find((c) => c.id === token.chainId)?.icon
     ? `https://icons.llamao.fi/icons/chains/rsz_${CHAIN_CONFIG.find((c) => c.id === token.chainId)?.icon}.jpg`
     : '/unknown-logo.png';
 
+  const isDisabled = !isChainSelected || isApiError;
+
   return (
     <div
       className={`
-        p-4 rounded-lg border cursor-pointer transition-all
-        ${isActive ? 'border-blue-500 shadow-sm' : 'border-gray-200 hover:border-blue-300'}
+        p-4 rounded-lg border transition-all
+        ${
+          isActive
+            ? 'border-blue-500 shadow-sm'
+            : isDisabled
+              ? 'border-gray-200 opacity-60 cursor-not-allowed'
+              : 'border-gray-200 hover:border-blue-300 cursor-pointer'
+        }
       `}
-      onClick={onSelect}
+      onClick={isDisabled ? undefined : onSelect}
+      title={
+        !isChainSelected
+          ? `${token.chainName} is not currently selected`
+          : isApiError
+            ? 'Token data unavailable due to API error'
+            : ''
+      }
     >
       <div className="flex items-center gap-2 mb-2">
         <img
@@ -502,7 +544,7 @@ function calculatePriceChange(priceHistory: number[]): {
   const valueDiff = newPrice - prevPrice;
   const percentDiff = (valueDiff / prevPrice) * 100;
 
-  const MIN_PRICE_CHANGE = 0.01; // 1%
+  const MIN_PRICE_CHANGE = 0.01;
 
   if (Math.abs(percentDiff) < MIN_PRICE_CHANGE) return null;
 

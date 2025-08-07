@@ -22,6 +22,7 @@ export default function TokenConverter({
   chainIds,
   tokenSelections,
   onTokenSelect,
+  onError,
   className = '',
 }: {
   chainIds: string[];
@@ -30,10 +31,17 @@ export default function TokenConverter({
     to: TokenSelection;
   };
   onTokenSelect: (selections: { from: TokenSelection; to: TokenSelection }) => void;
+  onError?: (error: Error | null) => void;
   className?: string;
 }) {
   const [amount, setAmount] = useState<string>('');
   const { data: tokens, isLoading, error } = useCoinGeckoTokens({ chainIds });
+
+  useEffect(() => {
+    if (onError) {
+      onError(error || null);
+    }
+  }, [error, onError]);
 
   const [fromPriceDiff, setFromPriceDiff] = useState<PriceDifference | null>(null);
   const [toPriceDiff, setToPriceDiff] = useState<PriceDifference | null>(null);
@@ -72,7 +80,7 @@ export default function TokenConverter({
       const valueDiff = newPrice - prevPrice;
       const percentDiff = prevPrice !== 0 ? (valueDiff / prevPrice) * 100 : 0;
 
-      const MIN_PRICE_CHANGE = 0.01; // 1%
+      const MIN_PRICE_CHANGE = 0.01;
 
       if (Math.abs(percentDiff) >= MIN_PRICE_CHANGE) {
         setDiff({
