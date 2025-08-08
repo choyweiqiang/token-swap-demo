@@ -1,69 +1,120 @@
-# React + TypeScript + Vite
+# Token Swap Demo
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive token swap interface built with React, TypeScript, and Vite. This application allows users to swap tokens across different blockchain networks with real-time price tracking, recently used tokens history, and interactive price charts.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Multi-Chain Support**: Switch between different blockchain networks
+- **Token Selection**: Search and select from a wide range of tokens
+- **Real-Time Price Data**: Fetch current token prices from CoinGecko API
+- **Price Conversion**: Automatically calculate token conversion rates
+- **Recently Used Tokens**: Track and display recently used tokens with:
+  - Price history visualization with interactive charts
+  - 25th, 50th, and 75th percentile price indicators
+  - Real-time price change percentage
+  - Timestamp-based x-axis for historical context
+- **Responsive Design**: Works on desktop and mobile devices
+- **Dark/Light Mode**: Toggle between dark and light themes
+- **Local Storage**: Persist user preferences and recently used tokens
 
-## Expanding the ESLint configuration
+## Technology Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Frontend
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **React 19**: UI library for building component-based interfaces
+- **TypeScript**: Static typing for improved developer experience
+- **Vite**: Fast, modern frontend build tool
+- **Tailwind CSS**: Utility-first CSS framework for styling
+- **React Query**: Data fetching and state management
+- **Chart.js & react-chartjs-2**: Interactive charts for price history visualization
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+### APIs
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
+- **CoinGecko API**: Token price data
+- **FunKit API**: Blockchain and token information
+
+### Development Tools
+
+- **ESLint**: Code linting
+- **Prettier**: Code formatting
+- **Husky**: Git hooks for pre-commit checks
+- **lint-staged**: Run linters on staged files
+
+## System Design
+
+### Architecture
+
+The application follows a component-based architecture with a clear separation of concerns:
+
+```
+src/
+├── api/                # API clients and service integrations
+├── assets/             # Static assets like icons
+├── const/              # Constants and configuration
+├── context/            # React context providers
+├── features/           # Feature-based components
+│   ├── chain-switcher/ # Chain selection functionality
+│   └── token-converter/ # Token conversion and recently used tokens
+├── hooks/              # Custom React hooks
+├── providers/          # Application-wide providers
+├── styles/             # Global styles
+├── types/              # TypeScript type definitions
+├── ui/                 # Reusable UI components
+└── utils/              # Utility functions
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Data Flow
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x';
-import reactDom from 'eslint-plugin-react-dom';
+1. **User Interaction**: User selects chains and tokens through the UI
+2. **API Requests**: Application fetches token data and prices from external APIs
+3. **State Management**: React state and context manage application state
+4. **Local Storage**: User preferences and recently used tokens are persisted
+5. **UI Updates**: Components re-render based on state changes
 
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-]);
-```
+### Recently Used Tokens Feature
+
+The Recently Used Tokens feature tracks the last 4 tokens selected by the user:
+
+- Stores token data, price history, and price change information
+- Calculates price trends and percentiles for visualization
+- Persists data in localStorage for session continuity
+- Prevents re-selection of already active tokens with warning alerts
+- Displays interactive price charts with percentile indicators
+
+## Setup and Installation
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- npm, yarn, or pnpm
+
+### Installation
+
+1. Clone the repository:
+
+   ```bash
+   git clone git@github.com:choyweiqiang/token-swap-demo.git
+   cd token-swap-demo
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   pnpm install
+   ```
+
+3. Set up environment variables
+
+   ```bash
+   cp .env.local .env
+   ```
+
+   Update the api key with your api key
+
+4. Start the development server:
+
+   ```bash
+   pnpm dev
+   ```
+
+5. Open your browser and navigate to `http://localhost:5173`
