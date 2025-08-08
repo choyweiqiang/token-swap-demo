@@ -126,3 +126,8 @@ The Recently Used Tokens feature tracks the last 4 tokens selected by the user:
    ```
 
 5. Open your browser and navigate to `http://localhost:5173`
+
+### Future Improvemeents
+
+- **Monitoring and Alarms**: Add logging to track user's behaviors and log any unexpected errors
+- **i18n**: Provide translations to the users.
