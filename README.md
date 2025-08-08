@@ -2,7 +2,15 @@
 
 A modern, responsive token swap interface built with React, TypeScript, and Vite. This application allows users to swap tokens across different blockchain networks with real-time price tracking, recently used tokens history, and interactive price charts.
 
+| Dark Mode                                                                                                | Light Mode                                                                                                |
+| -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| ![Dark Mode](https://github.com/choyweiqiang/token-swap-demo/blob/master/public/6102811948665128138.jpg) | ![Light Mode](https://github.com/choyweiqiang/token-swap-demo/blob/master/public/6102811948665128142.jpg) |
+
 ## Features
+
+| Web Feature Demo                                                                                     | Mobile Feature Demo                                                                                       |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| ![Web Feature Demo](https://github.com/choyweiqiang/token-swap-demo/blob/master/public/web_demo.gif) | ![Mobile Feature Demo](https://github.com/choyweiqiang/token-swap-demo/blob/master/public/phone_demo.gif) |
 
 - **Multi-Chain Support**: Switch between different blockchain networks
 - **Token Selection**: Search and select from a wide range of tokens
